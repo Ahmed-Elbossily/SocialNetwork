@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "514579082870",
+    "firebase_url": "https://socialnetwork-b83cf.firebaseio.com",
+    "project_id": "socialnetwork-b83cf",
+    "storage_bucket": "socialnetwork-b83cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514579082870:android:d630265000c44be7",
+        "android_client_info": {
+          "package_name": "com.ahmedelbossily.app.socialnetwork"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "514579082870-j510p2kcab8kim2k9c7ijduadh11buav.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ahmedelbossily.app.socialnetwork",
+            "certificate_hash": "8f1914774465b537e1656271d22d1c16fd4874f8"
+          }
+        },
+        {
+          "client_id": "514579082870-eeq79ih9eu6502n7tni1oakq7ojtbn72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZj7EDNJbIvcwwUsGCQ9KaJptsR45Fu_I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "514579082870-eeq79ih9eu6502n7tni1oakq7ojtbn72.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
