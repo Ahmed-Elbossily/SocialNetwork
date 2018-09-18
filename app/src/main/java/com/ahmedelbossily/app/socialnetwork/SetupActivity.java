@@ -78,6 +78,7 @@ public class SetupActivity extends AppCompatActivity {
             userMap.put("gender", "none");
             userMap.put("dob", "none");
             userMap.put("relationshipStatus", "none");
+
             UsersReference.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
@@ -101,7 +102,7 @@ public class SetupActivity extends AppCompatActivity {
         startActivity(mainIntent);
         finish();
     }
-////
+
     private void LoadingBar(){
         spotsDialog = (SpotsDialog) new SpotsDialog.Builder()
                 .setContext(SetupActivity.this)
