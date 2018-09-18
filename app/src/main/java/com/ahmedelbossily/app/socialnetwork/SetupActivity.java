@@ -101,7 +101,7 @@ public class SetupActivity extends AppCompatActivity {
         startActivity(mainIntent);
         finish();
     }
-
+//
     private void LoadingBar(){
         spotsDialog = (SpotsDialog) new SpotsDialog.Builder()
                 .setContext(SetupActivity.this)
