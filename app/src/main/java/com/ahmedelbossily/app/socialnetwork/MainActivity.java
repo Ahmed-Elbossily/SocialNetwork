@@ -15,16 +15,22 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
     private RecyclerView postList;
     private Toolbar toolbar;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
 
     private FirebaseAuth auth;
+    private DatabaseReference UsersReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         auth = FirebaseAuth.getInstance();
+        UsersReference = FirebaseDatabase.getInstance().getReference().child("Users");
 
         drawerLayout = findViewById(R.id.drawable_layout);
         navigationView = findViewById(R.id.navigation_view);
@@ -95,7 +102,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_logout:
-                Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
+                auth.signOut();
+                sendUserToLoginActivity();
                 break;
         }
     }
@@ -106,7 +115,34 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
             sendUserToLoginActivity();
+        } else {
+            checkUserExistence();
         }
+    }
+
+    private void checkUserExistence() {
+        final String current_user_id = auth.getCurrentUser().getUid();
+
+        UsersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild(current_user_id)) {
+                    sendUserToSetupActivity();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void sendUserToSetupActivity() {
+        Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
+        setupIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(setupIntent);
+        finish();
     }
 
     private void sendUserToLoginActivity() {

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ahmedelbossily.app.socialnetwork">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,6 +27,11 @@
         <activity android:name=".LoginActivity">
 
         </activity>
+
+        <activity android:name=".SetupActivity">
+
+        </activity>
+
     </application>
 
 </manifest>
