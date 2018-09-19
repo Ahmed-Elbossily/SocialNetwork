@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -114,13 +116,15 @@ public class SetupActivity extends AppCompatActivity {
                 spotsDialog.show();
 
                 Uri resultUri = result.getUri();
-                StorageReference filePath = UserProfileImageReference.child(currentUserID + ".jpg");
+                final StorageReference filePath = UserProfileImageReference.child(currentUserID + ".jpg");
+
                 filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(SetupActivity.this, "Profile Image stored successfully to Firebase Storage...", Toast.LENGTH_SHORT).show();
-                            final String downloadUrl = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
+                            final String downloadUrl = task.getResult().getDownloadUrl().toString();
+                            Log.e("URL", "URL: " + downloadUrl);
                             UsersReference.child("profileImage").setValue(downloadUrl).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -142,6 +146,8 @@ public class SetupActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 spotsDialog.dismiss();
@@ -195,6 +201,21 @@ public class SetupActivity extends AppCompatActivity {
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();
+    }
+
+    private void sendUserToLoginActivity() {
+        Intent loginIntent = new Intent(SetupActivity.this, LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
+        finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (currentUserID == null) {
+            sendUserToLoginActivity();
+        }
     }
 
     private void LoadingBar(){
