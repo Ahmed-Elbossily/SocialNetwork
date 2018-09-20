@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference UsersReference;
 
     private String currentUserID;
-
+//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
