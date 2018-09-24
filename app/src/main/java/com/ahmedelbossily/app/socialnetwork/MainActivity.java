@@ -223,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_profile:
-                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+                sendUserToProfileActivity();
                 break;
 
             case R.id.nav_home:
@@ -235,7 +236,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_find_friends:
-                Toast.makeText(this, "Find Friends", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Find Friends", Toast.LENGTH_SHORT).show();
+                sendUserToFindFriendsActivity();
                 break;
 
             case R.id.nav_messages:
@@ -243,7 +245,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_settings:
-                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
+                sendUserToSettingsActivity();
                 break;
 
             case R.id.nav_logout:
@@ -295,5 +298,20 @@ public class MainActivity extends AppCompatActivity {
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(loginIntent);
         finish();
+    }
+
+    private void sendUserToSettingsActivity() {
+        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(settingsIntent);
+    }
+
+    private void sendUserToProfileActivity() {
+        Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(profileIntent);
+    }
+
+    private void sendUserToFindFriendsActivity() {
+        Intent findFriendsIntent = new Intent(MainActivity.this, FindFriendsActivity.class);
+        startActivity(findFriendsIntent);
     }
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +43,7 @@ public class ClickPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_click_post);
 
         PostKey = getIntent().getExtras().get("PostKey").toString();
+        Log.e("PostKey: ", PostKey);
 
         auth = FirebaseAuth.getInstance();
         currentUserID = auth.getCurrentUser().getUid();
@@ -62,6 +64,7 @@ public class ClickPostActivity extends AppCompatActivity {
                     databaseUserID = dataSnapshot.child("uid").getValue().toString();
                     description = dataSnapshot.child("description").getValue().toString();
                     image = dataSnapshot.child("postImage").getValue().toString();
+
                     postDescription.setText(description);
                     Picasso.get().load(image).into(postImage);
 

@@ -18,10 +18,10 @@
 
     <TextView
         android:id="@+id/nav_user_full_name"
-        android:layout_width="135dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/nav_profile_image"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="70dp"
         android:layout_marginTop="10dp"
         android:text="Username"
         android:textAlignment="center"
