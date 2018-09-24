@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 public class FindFriendsActivity extends AppCompatActivity {
-
+//
     private Toolbar toolbar;
     private EditText searchBoxInput;
     private ImageButton searchPeopleFriendsButton;
