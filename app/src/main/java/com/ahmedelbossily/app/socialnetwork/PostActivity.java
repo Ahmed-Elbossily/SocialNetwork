@@ -52,6 +52,8 @@ public class PostActivity extends AppCompatActivity {
     private String postRandomName;
     private String downloadUrl;
 
+    private long countPosts = 0;
+
     private Uri imageUri;
     private static final int GALLERY_PICK_CODE = 1;
 
@@ -95,8 +97,7 @@ public class PostActivity extends AppCompatActivity {
         Description = PostDescription.getText().toString();
         if (imageUri == null) {
             Toast.makeText(this, "Please select post image...", Toast.LENGTH_SHORT).show();
-        }
-        else if (TextUtils.isEmpty(Description)) {
+        } else if (TextUtils.isEmpty(Description)) {
             Toast.makeText(this, "Please say something about your image...", Toast.LENGTH_SHORT).show();
         } else {
             LoadingBar();
@@ -133,6 +134,22 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void savingPostInformationToDatabase() {
+        PostsReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    countPosts = dataSnapshot.getChildrenCount();
+                } else {
+                    countPosts = 0;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         UsersReference.child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -148,6 +165,7 @@ public class PostActivity extends AppCompatActivity {
                     postMap.put("postImage", downloadUrl);
                     postMap.put("profileImage", userProfileImage);
                     postMap.put("fullname", userFullname);
+                    postMap.put("counter", countPosts);
 
                     PostsReference.child(currentUserID + postRandomName).updateChildren(postMap).addOnCompleteListener(new OnCompleteListener() {
                         @Override
@@ -203,7 +221,7 @@ public class PostActivity extends AppCompatActivity {
         startActivity(mainIntent);
     }
 
-    private void LoadingBar(){
+    private void LoadingBar() {
         spotsDialog = (SpotsDialog) new SpotsDialog.Builder()
                 .setContext(PostActivity.this)
                 //.setMessage("Please wait, while we are creating your new account...")

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorProfile"
-    tools:context=".ProfileActivity">
+    tools:context=".PersonProfileActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/my_profile_pic"
+                android:id="@+id/person_profile_pic"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 android:layout_alignParentTop="true"
@@ -27,10 +27,10 @@
                 android:src="@drawable/profile" />
 
             <TextView
-                android:id="@+id/my_profile_full_name"
+                android:id="@+id/person_profile_full_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_pic"
+                android:layout_below="@id/person_profile_pic"
                 android:layout_marginTop="5dp"
                 android:text="Profile Name"
                 android:textAlignment="center"
@@ -40,10 +40,10 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/my_profile_username"
+                android:id="@+id/person_profile_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_full_name"
+                android:layout_below="@id/person_profile_full_name"
                 android:text="Username"
                 android:textAlignment="center"
                 android:textAllCaps="false"
@@ -51,10 +51,10 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/my_profile_status"
+                android:id="@+id/person_profile_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_username"
+                android:layout_below="@id/person_profile_username"
                 android:layout_marginTop="5dp"
                 android:text="Status"
                 android:textAlignment="center"
@@ -63,10 +63,10 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/my_profile_country"
+                android:id="@+id/person_profile_country"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_status"
+                android:layout_below="@id/person_profile_status"
                 android:layout_marginTop="60dp"
                 android:text="Country"
                 android:textAlignment="center"
@@ -75,10 +75,10 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/my_profile_dob"
+                android:id="@+id/person_profile_dob"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_country"
+                android:layout_below="@id/person_profile_country"
                 android:layout_marginTop="2dp"
                 android:text="Date of Birth"
                 android:textAlignment="center"
@@ -87,10 +87,10 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/my_profile_gender"
+                android:id="@+id/person_profile_gender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_dob"
+                android:layout_below="@id/person_profile_dob"
                 android:layout_marginTop="2dp"
                 android:text="Gender"
                 android:textAlignment="center"
@@ -99,16 +99,44 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/my_profile_relationship_status"
+                android:id="@+id/person_profile_relationship_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/my_profile_gender"
+                android:layout_below="@id/person_profile_gender"
                 android:layout_marginTop="2dp"
                 android:text="Relataionship Status"
                 android:textAlignment="center"
                 android:textAllCaps="false"
                 android:textColor="@color/colorAccent"
                 android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/person_send_friend_request_button"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/person_profile_relationship_status"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="45dp"
+                android:background="@drawable/button"
+                android:text="Send Friend Request"
+                android:textAllCaps="false"
+                android:textColor="@android:color/background_light"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/person_decline_friend_request_button"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/person_send_friend_request_button"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/button"
+                android:text="Decline Friend Request"
+                android:textAllCaps="false"
+                android:textColor="@android:color/holo_red_light"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </RelativeLayout>
 

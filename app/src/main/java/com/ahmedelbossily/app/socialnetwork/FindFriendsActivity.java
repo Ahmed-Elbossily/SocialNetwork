@@ -1,5 +1,6 @@
 package com.ahmedelbossily.app.socialnetwork;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -76,20 +77,30 @@ public class FindFriendsActivity extends AppCompatActivity {
 
         FirebaseRecyclerAdapter<FindFriends, FindFriendsViewHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<FindFriends, FindFriendsViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull FindFriendsViewHolder holder, int position, @NonNull FindFriends model) {
-                holder.setProfileImage(model.getProfileImage());
-                holder.setFullname(model.getFullname());
-                holder.setStatus(model.getStatus());
-            }
+                    @Override
+                    protected void onBindViewHolder(@NonNull FindFriendsViewHolder holder, final int position, @NonNull FindFriends model) {
+                        holder.setProfileImage(model.getProfileImage());
+                        holder.setFullname(model.getFullname());
+                        holder.setStatus(model.getStatus());
 
-            @NonNull
-            @Override
-            public FindFriendsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_users_display_layout, parent, false);
-                return new FindFriendsViewHolder(view);
-            }
-        };
+                        holder.view.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String visitUserId = getRef(position).getKey();
+                                Intent personProfileIntent = new Intent(FindFriendsActivity.this, PersonProfileActivity.class);
+                                personProfileIntent.putExtra("visitUserId", visitUserId);
+                                startActivity(personProfileIntent);
+                            }
+                        });
+                    }
+
+                    @NonNull
+                    @Override
+                    public FindFriendsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_users_display_layout, parent, false);
+                        return new FindFriendsViewHolder(view);
+                    }
+                };
         searchResultList.setAdapter(firebaseRecyclerAdapter);
     }
 

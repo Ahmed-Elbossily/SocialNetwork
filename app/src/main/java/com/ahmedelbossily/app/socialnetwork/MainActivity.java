@@ -28,6 +28,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -100,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     if (dataSnapshot.hasChild("profileImage")) {
                         String image = dataSnapshot.child("profileImage").getValue().toString();
                         Picasso.get().load(image).into(NavProfileImage);
-                    }
-                    else {
+                    } else {
                         Toast.makeText(MainActivity.this, "Profile name does't exists...", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -132,79 +132,80 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayAllUsersPosts() {
+        Query sortPostsInDescendingOrder = PostsReference.orderByChild("counter");
 
         FirebaseRecyclerOptions<Posts> options = new FirebaseRecyclerOptions.Builder<Posts>()
-                .setQuery(PostsReference, Posts.class)
+                .setQuery(sortPostsInDescendingOrder, Posts.class)
                 .setLifecycleOwner(this)
                 .build();
 
         FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull PostsViewHolder holder, int position, @NonNull Posts model) {
-                final String postKey = getRef(position).getKey();
-
-                holder.setFullname(model.getFullname());
-                holder.setDescription(model.getDescription());
-                holder.setProfileImage(model.getProfileImage());
-                holder.setPostImage(model.getPostImage());
-                holder.setDate(model.getDate());
-                holder.setTime(model.getTime());
-
-                holder.setLikeButtonStatus(postKey);
-
-                holder.view.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        Intent clickPostIntent = new Intent(MainActivity.this, ClickPostActivity.class);
-                        clickPostIntent.putExtra("PostKey", postKey);
-                        startActivity(clickPostIntent);
-                    }
-                });
+                    protected void onBindViewHolder(@NonNull PostsViewHolder holder, int position, @NonNull Posts model) {
+                        final String postKey = getRef(position).getKey();
 
-                holder.likePostButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        likeChecker = true;
-                        LikesReference.addValueEventListener(new ValueEventListener() {
+                        holder.setFullname(model.getFullname());
+                        holder.setDescription(model.getDescription());
+                        holder.setProfileImage(model.getProfileImage());
+                        holder.setPostImage(model.getPostImage());
+                        holder.setDate(model.getDate());
+                        holder.setTime(model.getTime());
+
+                        holder.setLikeButtonStatus(postKey);
+
+                        holder.view.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                if (likeChecker.equals(true)) {
-                                    if (dataSnapshot.child(postKey).hasChild(currentUserID)) {
-                                        LikesReference.child(postKey).child(currentUserID).removeValue();
-                                        likeChecker = false;
-                                    } else {
-                                        LikesReference.child(postKey).child(currentUserID).setValue(true);
-                                        likeChecker = false;
-                                    }
-                                }
+                            public void onClick(View v) {
+                                Intent clickPostIntent = new Intent(MainActivity.this, ClickPostActivity.class);
+                                clickPostIntent.putExtra("PostKey", postKey);
+                                startActivity(clickPostIntent);
                             }
+                        });
 
+                        holder.likePostButton.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            public void onClick(View v) {
+                                likeChecker = true;
+                                LikesReference.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (likeChecker.equals(true)) {
+                                            if (dataSnapshot.child(postKey).hasChild(currentUserID)) {
+                                                LikesReference.child(postKey).child(currentUserID).removeValue();
+                                                likeChecker = false;
+                                            } else {
+                                                LikesReference.child(postKey).child(currentUserID).setValue(true);
+                                                likeChecker = false;
+                                            }
+                                        }
+                                    }
 
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        });
+
+                        holder.commentPostButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent commentsIntent = new Intent(MainActivity.this, CommentsActivity.class);
+                                commentsIntent.putExtra("PostKey", postKey);
+                                startActivity(commentsIntent);
                             }
                         });
                     }
-                });
 
-                holder.commentPostButton.setOnClickListener(new View.OnClickListener() {
+                    @NonNull
                     @Override
-                    public void onClick(View v) {
-                        Intent commentsIntent = new Intent(MainActivity.this, CommentsActivity.class);
-                        commentsIntent.putExtra("PostKey", postKey);
-                        startActivity(commentsIntent);
+                    public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout, parent, false);
+                        return new PostsViewHolder(view);
                     }
-                });
-            }
-
-            @NonNull
-            @Override
-            public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout, parent, false);
-                return new PostsViewHolder(view);
-            }
-        };
+                };
         postList.setAdapter(firebaseRecyclerAdapter);
     }
 
@@ -254,22 +255,27 @@ public class MainActivity extends AppCompatActivity {
             TextView username = view.findViewById(R.id.post_user_name);
             username.setText(fullname);
         }
+
         public void setDescription(String description) {
             TextView postDescription = view.findViewById(R.id.post_description);
             postDescription.setText(description);
         }
+
         public void setProfileImage(String profileImage) {
             CircleImageView image = view.findViewById(R.id.post_profile_image);
             Picasso.get().load(profileImage).into(image);
         }
+
         public void setPostImage(String postImage) {
             ImageView image = view.findViewById(R.id.post_image);
             Picasso.get().load(postImage).into(image);
         }
+
         public void setDate(String date) {
             TextView postDate = view.findViewById(R.id.post_date);
             postDate.setText("   " + date);
         }
+
         public void setTime(String time) {
             TextView postTime = view.findViewById(R.id.post_time);
             postTime.setText("   " + time);

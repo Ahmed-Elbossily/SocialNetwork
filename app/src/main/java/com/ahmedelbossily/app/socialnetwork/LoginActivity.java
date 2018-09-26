@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText UserEmail, UserPassword;
     private Button LoginButton;
-    private TextView NeedNewAccountLink;
+    private TextView NeedNewAccountLink, ForgetPasswordLink;
     private ImageView FacebookSignInButton, TwitterSignInButton, GoogleSignInButton;
     private SpotsDialog spotsDialog;
 
@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         UserPassword = findViewById(R.id.login_password);
         LoginButton = findViewById(R.id.login_button);
         NeedNewAccountLink = findViewById(R.id.register_account_link);
+        ForgetPasswordLink = findViewById(R.id.forget_password_link);
         FacebookSignInButton = findViewById(R.id.facebook_signin_button);
         TwitterSignInButton = findViewById(R.id.twitter_signin_button);
         GoogleSignInButton = findViewById(R.id.google_signin_button);
@@ -64,6 +65,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendUserToRegisterActivity();
+            }
+        });
+
+        ForgetPasswordLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendUserToResetPasswordActivity();
             }
         });
 
@@ -189,6 +197,11 @@ public class LoginActivity extends AppCompatActivity {
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(loginIntent);
         finish();
+    }
+
+    private void sendUserToResetPasswordActivity() {
+        Intent resetPasswordIntent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+        startActivity(resetPasswordIntent);
     }
 
     @Override
