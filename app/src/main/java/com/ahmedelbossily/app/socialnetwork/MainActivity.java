@@ -139,73 +139,72 @@ public class MainActivity extends AppCompatActivity {
                 .setLifecycleOwner(this)
                 .build();
 
-        FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter =
-                new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
+        FirebaseRecyclerAdapter<Posts, PostsViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Posts, PostsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull PostsViewHolder holder, int position, @NonNull Posts model) {
+                final String postKey = getRef(position).getKey();
+
+                holder.setFullname(model.getFullname());
+                holder.setDescription(model.getDescription());
+                holder.setProfileImage(model.getProfileImage());
+                holder.setPostImage(model.getPostImage());
+                holder.setDate(model.getDate());
+                holder.setTime(model.getTime());
+
+                holder.setLikeButtonStatus(postKey);
+
+                holder.view.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    protected void onBindViewHolder(@NonNull PostsViewHolder holder, int position, @NonNull Posts model) {
-                        final String postKey = getRef(position).getKey();
+                    public void onClick(View v) {
+                        Intent clickPostIntent = new Intent(MainActivity.this, ClickPostActivity.class);
+                        clickPostIntent.putExtra("PostKey", postKey);
+                        startActivity(clickPostIntent);
+                    }
+                });
 
-                        holder.setFullname(model.getFullname());
-                        holder.setDescription(model.getDescription());
-                        holder.setProfileImage(model.getProfileImage());
-                        holder.setPostImage(model.getPostImage());
-                        holder.setDate(model.getDate());
-                        holder.setTime(model.getTime());
-
-                        holder.setLikeButtonStatus(postKey);
-
-                        holder.view.setOnClickListener(new View.OnClickListener() {
+                holder.likePostButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        likeChecker = true;
+                        LikesReference.addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onClick(View v) {
-                                Intent clickPostIntent = new Intent(MainActivity.this, ClickPostActivity.class);
-                                clickPostIntent.putExtra("PostKey", postKey);
-                                startActivity(clickPostIntent);
-                            }
-                        });
-
-                        holder.likePostButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                likeChecker = true;
-                                LikesReference.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (likeChecker.equals(true)) {
-                                            if (dataSnapshot.child(postKey).hasChild(currentUserID)) {
-                                                LikesReference.child(postKey).child(currentUserID).removeValue();
-                                                likeChecker = false;
-                                            } else {
-                                                LikesReference.child(postKey).child(currentUserID).setValue(true);
-                                                likeChecker = false;
-                                            }
-                                        }
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (likeChecker.equals(true)) {
+                                    if (dataSnapshot.child(postKey).hasChild(currentUserID)) {
+                                        LikesReference.child(postKey).child(currentUserID).removeValue();
+                                        likeChecker = false;
+                                    } else {
+                                        LikesReference.child(postKey).child(currentUserID).setValue(true);
+                                        likeChecker = false;
                                     }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
+                                }
                             }
-                        });
 
-                        holder.commentPostButton.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                Intent commentsIntent = new Intent(MainActivity.this, CommentsActivity.class);
-                                commentsIntent.putExtra("PostKey", postKey);
-                                startActivity(commentsIntent);
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
                             }
                         });
                     }
+                });
 
-                    @NonNull
+                holder.commentPostButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout, parent, false);
-                        return new PostsViewHolder(view);
+                    public void onClick(View v) {
+                        Intent commentsIntent = new Intent(MainActivity.this, CommentsActivity.class);
+                        commentsIntent.putExtra("PostKey", postKey);
+                        startActivity(commentsIntent);
                     }
-                };
+                });
+            }
+
+            @NonNull
+            @Override
+            public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_posts_layout, parent, false);
+                return new PostsViewHolder(view);
+            }
+        };
         postList.setAdapter(firebaseRecyclerAdapter);
     }
 
@@ -312,7 +311,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_friends:
-                Toast.makeText(this, "Friends", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Friends", Toast.LENGTH_SHORT).show();
+                sendUserToFriendsActivity();
                 break;
 
             case R.id.nav_find_friends:
@@ -321,7 +321,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_messages:
-                Toast.makeText(this, "Messages", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Messages", Toast.LENGTH_SHORT).show();
+                sendUserToFriendsActivity();
                 break;
 
             case R.id.nav_settings:
@@ -393,5 +394,15 @@ public class MainActivity extends AppCompatActivity {
     private void sendUserToFindFriendsActivity() {
         Intent findFriendsIntent = new Intent(MainActivity.this, FindFriendsActivity.class);
         startActivity(findFriendsIntent);
+    }
+
+    private void sendUserToFriendsActivity() {
+        Intent friendsIntent = new Intent(MainActivity.this, FriendsActivity.class);
+        startActivity(friendsIntent);
+    }
+
+    private void sendUserToChatActivity() {
+        Intent chatIntent = new Intent(MainActivity.this, ChatActivity.class);
+        startActivity(chatIntent);
     }
 }
