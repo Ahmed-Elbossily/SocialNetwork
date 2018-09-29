@@ -89,7 +89,11 @@ public class CommentsActivity extends AppCompatActivity {
                 });
             }
         });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         displayAllUsersComments();
     }
 
@@ -122,32 +126,29 @@ public class CommentsActivity extends AppCompatActivity {
     public static class CommentsViewHolder extends RecyclerView.ViewHolder {
         View view;
 
-        TextView commentUsername, commentText, commentDate, commentTime;
-
         public CommentsViewHolder(View itemView) {
             super(itemView);
             view = itemView;
-
-            commentUsername = view.findViewById(R.id.comment_username);
-            commentText = view.findViewById(R.id.comment_text);
-            commentDate = view.findViewById(R.id.comment_date);
-            commentTime = view.findViewById(R.id.comment_time);
         }
 
         public void setUsername(String username) {
-            commentUsername.setText(username);
+            TextView commentUsername = view.findViewById(R.id.comment_username);
+            commentUsername.setText("@" + username + "  ");
         }
 
         public void setComment(String comment) {
+            TextView commentText = view.findViewById(R.id.comment_text);
             commentText.setText(comment);
         }
 
         public void setDate(String date) {
-            commentDate.setText(date);
+            TextView commentDate = view.findViewById(R.id.comment_date);
+            commentDate.setText("  Date: " + date);
         }
 
         public void setTime(String time) {
-            commentTime.setText(time);
+            TextView commentTime = view.findViewById(R.id.comment_time);
+            commentTime.setText("  Time: " + time);
         }
     }
 
