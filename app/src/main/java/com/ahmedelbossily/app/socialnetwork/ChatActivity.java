@@ -11,11 +11,14 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -73,6 +76,46 @@ public class ChatActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
+
+        displayMessages();
+    }
+
+    private void initFields() {
+        toolbar = findViewById(R.id.chat_bar_layout);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View actionBarView = layoutInflater.inflate(R.layout.chat_custom_bar, null);
+        actionBar.setCustomView(actionBarView);
+
+        receiverName = findViewById(R.id.custom_profile_name);
+        receiverProfileImage = findViewById(R.id.custom_profile_image);
+
+        userMessageList = findViewById(R.id.messages_list_users);
+        sendImageFileButton = findViewById(R.id.send_image_file_button);
+        sendMessageButton = findViewById(R.id.send_message_button);
+        userMessageInput = findViewById(R.id.input_message);
+    }
+
+    private void displayReceiverInfo() {
+        receiverName.setText(messageReceiverName);
+        RootReference.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String image = dataSnapshot.child("profileImage").getValue().toString();
+                    Picasso.get().load(image).into(receiverProfileImage);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void sendMessage() {
@@ -120,41 +163,40 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void initFields() {
-        toolbar = findViewById(R.id.chat_bar_layout);
-        setSupportActionBar(toolbar);
+    private void displayMessages() {
+        FirebaseRecyclerOptions<Messages> options = new FirebaseRecyclerOptions.Builder<Messages>()
+                .setQuery(RootReference.child("Messages").child(messageSenderID).child(messageReceiverID), Messages.class)
+                .setLifecycleOwner(this)
+                .build();
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowCustomEnabled(true);
-        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actionBarView = layoutInflater.inflate(R.layout.chat_custom_bar, null);
-        actionBar.setCustomView(actionBarView);
+        FirebaseRecyclerAdapter<Messages, MessagesViewHolder> firebaseRecyclerAdapter =
+                new FirebaseRecyclerAdapter<Messages, MessagesViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull MessagesViewHolder holder, int position, @NonNull Messages model) {
+                holder.setMessage(model.getMessage());
+            }
 
-        receiverName = findViewById(R.id.custom_profile_name);
-        receiverProfileImage = findViewById(R.id.custom_profile_image);
-
-        userMessageList = findViewById(R.id.messages_list_users);
-        sendImageFileButton = findViewById(R.id.send_image_file_button);
-        sendMessageButton = findViewById(R.id.send_message_button);
-        userMessageInput = findViewById(R.id.input_message);
+            @NonNull
+            @Override
+            public MessagesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout_of_users, parent, false);
+                return new MessagesViewHolder(view);
+            }
+        };
+        userMessageList.setAdapter(firebaseRecyclerAdapter);
     }
 
-    private void displayReceiverInfo() {
-        receiverName.setText(messageReceiverName);
-        RootReference.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String image = dataSnapshot.child("profileImage").getValue().toString();
-                    Picasso.get().load(image).into(receiverProfileImage);
-                }
-            }
+    public static class MessagesViewHolder extends RecyclerView.ViewHolder {
+        View view;
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+        public MessagesViewHolder(View itemView) {
+            super(itemView);
+            view = itemView;
+        }
 
-            }
-        });
+        public void setMessage(String message) {
+            TextView senderText = view.findViewById(R.id.sender_message_text);
+            senderText.setText(message);
+        }
     }
 }
