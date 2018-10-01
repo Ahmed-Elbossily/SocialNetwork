@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +33,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -131,6 +138,24 @@ public class MainActivity extends AppCompatActivity {
         displayAllUsersPosts();
     }
 
+    private void updateUserStatus(String state) {
+        String saveCurrentDate, saveCurrentTime;
+        Calendar calendarForDate = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
+        saveCurrentDate = currentDate.format(calendarForDate.getTime());
+
+        Calendar calendarForTime = Calendar.getInstance();
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime = currentTime.format(calendarForTime.getTime());
+
+        Map currentStateMap = new HashMap();
+        currentStateMap.put("time", saveCurrentTime);
+        currentStateMap.put("date", saveCurrentDate);
+        currentStateMap.put("type", state);
+
+        UsersReference.child(currentUserID).child("userState").updateChildren(currentStateMap);
+    }
+
     private void displayAllUsersPosts() {
         Query sortPostsInDescendingOrder = PostsReference.orderByChild("counter");
 
@@ -206,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         postList.setAdapter(firebaseRecyclerAdapter);
+        updateUserStatus("online");
     }
 
     public static class PostsViewHolder extends RecyclerView.ViewHolder {
@@ -297,12 +323,10 @@ public class MainActivity extends AppCompatActivity {
     private void userMenuSelector(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_post:
-                //Toast.makeText(this, "Add New Post", Toast.LENGTH_SHORT).show();
                 sendUserToPostActivity();
                 break;
 
             case R.id.nav_profile:
-                //Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
                 sendUserToProfileActivity();
                 break;
 
@@ -311,27 +335,23 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.nav_friends:
-                //Toast.makeText(this, "Friends", Toast.LENGTH_SHORT).show();
                 sendUserToFriendsActivity();
                 break;
 
             case R.id.nav_find_friends:
-                //Toast.makeText(this, "Find Friends", Toast.LENGTH_SHORT).show();
                 sendUserToFindFriendsActivity();
                 break;
 
             case R.id.nav_messages:
-                //Toast.makeText(this, "Messages", Toast.LENGTH_SHORT).show();
                 sendUserToFriendsActivity();
                 break;
 
             case R.id.nav_settings:
-                //Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
                 sendUserToSettingsActivity();
                 break;
 
             case R.id.nav_logout:
-                //Toast.makeText(this, "Logout", Toast.LENGTH_SHORT).show();
+                updateUserStatus("offline");
                 auth.signOut();
                 sendUserToLoginActivity();
                 break;

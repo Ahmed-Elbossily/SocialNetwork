@@ -43,6 +43,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private GoogleApiClient mGoogleSignInClient;
 
+
+    private Boolean emailAddressChecker;
     private static final int RC_SIGN_IN = 1;
 
     @Override
@@ -167,8 +169,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        sendUserToMainActivity();
-                        Toast.makeText(LoginActivity.this, "You are logged in successfully...", Toast.LENGTH_SHORT).show();
+                        verifyEmailAddress();
                         spotsDialog.dismiss();
                     } else {
                         String message = task.getException().getMessage();
@@ -177,6 +178,18 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
             });
+        }
+    }
+
+    private void verifyEmailAddress() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        emailAddressChecker = currentUser.isEmailVerified();
+        if (emailAddressChecker) {
+            sendUserToMainActivity();
+            Toast.makeText(this, "You are logged in successfully...", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Please verify your account first...", Toast.LENGTH_SHORT).show();
+            auth.signOut();
         }
     }
 
@@ -213,10 +226,9 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void LoadingBar(){
+    private void LoadingBar() {
         spotsDialog = (SpotsDialog) new SpotsDialog.Builder()
                 .setContext(LoginActivity.this)
-                //.setMessage("Please wait, while we are creating your new account...")
                 .setCancelable(false)
                 .build();
     }

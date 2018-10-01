@@ -43,14 +43,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
-    private TextView receiverName;
+    private TextView receiverName, userLastSeen;
     private CircleImageView receiverProfileImage;
     private RecyclerView userMessageList;
     private ImageButton sendImageFileButton, sendMessageButton;
     private EditText userMessageInput;
 
     private FirebaseAuth auth;
-    private DatabaseReference RootReference;
+    private DatabaseReference RootReference, UsersReference;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
@@ -69,6 +69,7 @@ public class ChatActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         messageSenderID = auth.getCurrentUser().getUid();
         RootReference = FirebaseDatabase.getInstance().getReference();
+        UsersReference = FirebaseDatabase.getInstance().getReference().child("Users");
 
         initFields();
 
@@ -129,6 +130,7 @@ public class ChatActivity extends AppCompatActivity {
         actionBar.setCustomView(actionBarView);
 
         receiverName = findViewById(R.id.custom_profile_name);
+        userLastSeen = findViewById(R.id.custom_user_last_seen);
         receiverProfileImage = findViewById(R.id.custom_profile_image);
 
         userMessageList = findViewById(R.id.messages_list_users);
@@ -143,12 +145,41 @@ public class ChatActivity extends AppCompatActivity {
         userMessageList.setAdapter(messagesAdapter);
     }
 
+    private void updateUserStatus(String state) {
+        String saveCurrentDate1, saveCurrentTime1;
+        Calendar calendarForDate = Calendar.getInstance();
+        SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
+        saveCurrentDate1 = currentDate.format(calendarForDate.getTime());
+
+        Calendar calendarForTime = Calendar.getInstance();
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        saveCurrentTime1 = currentTime.format(calendarForTime.getTime());
+
+        Map currentStateMap = new HashMap();
+        currentStateMap.put("time", saveCurrentTime1);
+        currentStateMap.put("date", saveCurrentDate1);
+        currentStateMap.put("type", state);
+
+        UsersReference.child(messageSenderID).child("userState").updateChildren(currentStateMap);
+    }
+
     private void displayReceiverInfo() {
         receiverName.setText(messageReceiverName);
+
         RootReference.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    String type = dataSnapshot.child("userState").child("type").getValue().toString();
+                    String lastDate = dataSnapshot.child("userState").child("date").getValue().toString();
+                    String lastTime = dataSnapshot.child("userState").child("time").getValue().toString();
+
+                    if (type.equals("online")) {
+                        userLastSeen.setText("online");
+                    } else {
+                        userLastSeen.setText("Last seen: " + lastTime + "  " + lastDate);
+                    }
+
                     String image = dataSnapshot.child("profileImage").getValue().toString();
                     Picasso.get().load(image).into(receiverProfileImage);
                 }
@@ -162,6 +193,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
+        updateUserStatus("online");
+
         String messageText = userMessageInput.getText().toString();
         if (TextUtils.isEmpty(messageText)) {
             Toast.makeText(this, "Please write your message...", Toast.LENGTH_SHORT).show();
@@ -205,41 +238,4 @@ public class ChatActivity extends AppCompatActivity {
             });
         }
     }
-
-//    private void displayMessages() {
-//        FirebaseRecyclerOptions<Messages> options = new FirebaseRecyclerOptions.Builder<Messages>()
-//                .setQuery(RootReference.child("Messages").child(messageSenderID).child(messageReceiverID), Messages.class)
-//                .setLifecycleOwner(this)
-//                .build();
-//
-//        FirebaseRecyclerAdapter<Messages, MessagesViewHolder> firebaseRecyclerAdapter =
-//                new FirebaseRecyclerAdapter<Messages, MessagesViewHolder>(options) {
-//            @Override
-//            protected void onBindViewHolder(@NonNull MessagesViewHolder holder, int position, @NonNull Messages model) {
-//                holder.setMessage(model.getMessage());
-//            }
-//
-//            @NonNull
-//            @Override
-//            public MessagesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout_of_users, parent, false);
-//                return new MessagesViewHolder(view);
-//            }
-//        };
-//        userMessageList.setAdapter(firebaseRecyclerAdapter);
-//    }
-//
-//    public static class MessagesViewHolder extends RecyclerView.ViewHolder {
-//        View view;
-//
-//        public MessagesViewHolder(View itemView) {
-//            super(itemView);
-//            view = itemView;
-//        }
-//
-//        public void setMessage(String message) {
-//            TextView senderText = view.findViewById(R.id.sender_message_text);
-//            senderText.setText(message);
-//        }
-//    }
 }

@@ -69,13 +69,32 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        sendUserToSetupActivity();
-                        Toast.makeText(RegisterActivity.this, "You are authenticated successfully...", Toast.LENGTH_SHORT).show();
+                        sendEmailVerificationMessage();
                         spotsDialog.dismiss();
                     } else {
                         String message = task.getException().getMessage();
                         Toast.makeText(RegisterActivity.this, "Error occured: " + message, Toast.LENGTH_SHORT).show();
                         spotsDialog.dismiss();
+                    }
+                }
+            });
+        }
+    }
+
+    private void sendEmailVerificationMessage() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            currentUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(RegisterActivity.this, "Registeration successful, We've sent you an email. Please check and verify...", Toast.LENGTH_SHORT).show();
+                        sendUserToLoginActivity();
+                        auth.signOut();
+                    } else {
+                        String message = task.getException().getMessage();
+                        Toast.makeText(RegisterActivity.this, "Error occured: " + message, Toast.LENGTH_SHORT).show();
+                        auth.signOut();
                     }
                 }
             });
@@ -98,18 +117,17 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
-    private void LoadingBar(){
-        spotsDialog = (SpotsDialog) new SpotsDialog.Builder()
-                .setContext(RegisterActivity.this)
-                //.setMessage("Please wait, while we are creating your new account...")
-                .setCancelable(false)
-                .build();
+    private void sendUserToLoginActivity() {
+        Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
+        finish();
     }
 
-    private void sendUserToSetupActivity() {
-        Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
-        setupIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(setupIntent);
-        finish();
+    private void LoadingBar() {
+        spotsDialog = (SpotsDialog) new SpotsDialog.Builder()
+                .setContext(RegisterActivity.this)
+                .setCancelable(false)
+                .build();
     }
 }
